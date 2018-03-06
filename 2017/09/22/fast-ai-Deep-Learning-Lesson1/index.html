@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="准备工作实现universal learning machine，我们现在已拥有三个至关重要的部分：无限灵活函数、万能参数拟合、具有快速和伸缩性  无限灵活函数：神经网络是一种函数，通过Universal approximation machine，利用逼近定理，这种数学函数可以处理任何我们抛过去的问题  万能参数拟合：对函数进行参数拟合，梯度下降方法、逆向传播方法  快速和伸缩性：采用NVIDI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="fast.ai Deep Learning Lesson1">
+<meta property="og:url" content="http://yoursite.com/2017/09/22/fast-ai-Deep-Learning-Lesson1/index.html">
+<meta property="og:site_name" content="Manan&#39;s Nar">
+<meta property="og:description" content="准备工作实现universal learning machine，我们现在已拥有三个至关重要的部分：无限灵活函数、万能参数拟合、具有快速和伸缩性  无限灵活函数：神经网络是一种函数，通过Universal approximation machine，利用逼近定理，这种数学函数可以处理任何我们抛过去的问题  万能参数拟合：对函数进行参数拟合，梯度下降方法、逆向传播方法  快速和伸缩性：采用NVIDI">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/2017/09/22/fast-ai-Deep-Learning-Lesson1/fast-ai-Deep-Learning-Lesson1/0.jpg">
+<meta property="og:image" content="http://yoursite.com/2017/09/22/fast-ai-Deep-Learning-Lesson1/fast-ai-Deep-Learning-Lesson1/1.jpg">
+<meta property="og:image" content="http://yoursite.com/2017/09/22/fast-ai-Deep-Learning-Lesson1/fast-ai-Deep-Learning-Lesson1/2.jpg">
+<meta property="og:image" content="http://yoursite.com/2017/09/22/fast-ai-Deep-Learning-Lesson1/fast-ai-Deep-Learning-Lesson1/3.jpg">
+<meta property="og:image" content="http://yoursite.com/2017/09/22/fast-ai-Deep-Learning-Lesson1/fast-ai-Deep-Learning-Lesson1/4.jpg">
+<meta property="og:updated_time" content="2017-09-23T12:36:29.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="fast.ai Deep Learning Lesson1">
+<meta name="twitter:description" content="准备工作实现universal learning machine，我们现在已拥有三个至关重要的部分：无限灵活函数、万能参数拟合、具有快速和伸缩性  无限灵活函数：神经网络是一种函数，通过Universal approximation machine，利用逼近定理，这种数学函数可以处理任何我们抛过去的问题  万能参数拟合：对函数进行参数拟合，梯度下降方法、逆向传播方法  快速和伸缩性：采用NVIDI">
+<meta name="twitter:image" content="http://yoursite.com/2017/09/22/fast-ai-Deep-Learning-Lesson1/fast-ai-Deep-Learning-Lesson1/0.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/09/22/fast-ai-Deep-Learning-Lesson1/"/>
+
+
+
+
+
+  <title>fast.ai Deep Learning Lesson1 | Manan's Nar</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Manan's Nar</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Startseite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archiv
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/22/fast-ai-Deep-Learning-Lesson1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Luqh">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Manan's Nar">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">fast.ai Deep Learning Lesson1</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-22T20:09:31+08:00">
+                2017-09-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h1><p>实现universal learning machine，我们现在已拥有三个至关重要的部分：无限灵活函数、万能参数拟合、具有快速和伸缩性</p>
+<ol>
+<li><p>无限灵活函数：神经网络是一种函数，通过Universal approximation machine，利用逼近定理，这种数学函数可以处理任何我们抛过去的问题</p>
+</li>
+<li><p>万能参数拟合：对函数进行参数拟合，梯度下降方法、逆向传播方法</p>
+</li>
+<li><p>快速和伸缩性：采用NVIDIA GPUs支持CUDA程序编制／Amazon P2实例，用AWS账号通过邮件申请</p>
+</li>
+</ol>
+<p>GTX970 200dollars／month<br>AWS instance 0.9dollars／hour<br>AWS t2.micro for free  </p>
+<p>The Keras Blog：使用非常小的数据建立强大的模型<br>jupyter notebook</p>
+<p>使用wget把数据放到AWS实例或服务器上<br><a href="https://www.platform.ai/files" target="_blank" rel="noopener">https://www.platform.ai/files</a></p>
+<pre><code>wget &lt;http://www.platform.ai/files/aws-alias.sh&gt;
+</code></pre><p>开始自动运行并下载文件</p>
+<pre><code>source aws-alias.sh
+alias
+aws-get-p2
+</code></pre><p>运行aws-get-p2，自动向亚马逊问我的P2实例账号，并打印出来，保存到一个叫做实例账号instanceID的变量中，所有的其他脚本会使用instanceID</p>
+<pre><code>aws-start
+</code></pre><p>打开实例，自动进行，和来到图形用户界面右键单击选择Start是一样的操作。在终端操作做的很棒的是：它会一直等到这个实例开始运行并且最后它会询问或者说要求网络地址，然后把它打印出来，课程给出脚本ip地址会显示成同一个。<br>然后我会得到一个aws-ssh，这个aws-ssh会运行并ssh到那个实例上</p>
+<pre><code>ssh ubuntu@$instanceIp
+</code></pre><p>脚本中存在AMI，使得使用脚本并登陆进去的时候可以直接开始操作</p>
+<p>现在开始吧！<br>我们已经为你们创建了一个目录叫做nbs</p>
+<pre><code>cd nbs
+</code></pre><p>要求亚马逊为我们建立一个jupyter notebook服务器</p>
+<pre><code>jupyter notebook
+</code></pre><p>会看到：The Jupyter Notebook is running at：</p>
+<p>在aws-start下最后一行得到ip地址：52.40.116.111后跟上端口号8888，打开浏览器访问这个地址52.40.116.111:8888</p>
+<p>New-&gt;Notebook-&gt;Python[condaRoot]，建立了科学计算环境<br>File-&gt;Rename,不同的人共享这个服务器建立不同的程序文件<br>按下H，即可看到快捷键的相关帮助<br>按下M，切换到MarkDown模式<br>按下Y，切换回代码模式<br>按下S，自动保存<br>终端cntl+c后结束运行</p>
+<p>利用Kaggle上的数据测试自己模型的好坏</p>
+<p>Tmux和screen都是程序，它们能够让你在服务器上运行程序，即使关闭了终端：</p>
+<p>cntl+b+双引号：建立第二个窗口<br>cntl+b+%：在左边增加一个窗口<br>cntl+b+d：结束所有这些操作</p>
+<p>回到服务器：</p>
+<pre><code>！ss
+ls
+vim .bashrc
+</code></pre><p>在文件最后一行加入：</p>
+<pre><code>source aws-alias.sh
+logout
+</code></pre><p>输入：</p>
+<pre><code>alias
+</code></pre><p>看到现在所有的别名，所以在用ssh登陆instance账号之前，必须找到正确的网络地址，可以通过输入aws-get-p2来获得实例id</p>
+<pre><code>aws-get-p2
+vim aws-alias.sh
+</code></pre><p>编辑文件，在alias aws-start加入alias aws-ip，如下图所示：<br><img src="fast-ai-Deep-Learning-Lesson1/0.jpg" alt=""><br>退出编辑模式，在终端输入：</p>
+<pre><code>source aws-alias.sh
+alias
+aws-ip
+</code></pre><p>现在我得到一个新的别名叫做aws-ip</p>
+<pre><code>ssh ubuntu@$instanceIp
+</code></pre><p>也可以换成如下，因为每次的ip地址都是一样的</p>
+<pre><code>ssh ubuntu@52.40.116.111
+</code></pre><p>回到原先的位置：</p>
+<pre><code>tmux attach
+</code></pre><p>右下角程序运行：</p>
+<pre><code>jupter notebook
+</code></pre><p>处理数据：<br><img src="fast-ai-Deep-Learning-Lesson1/1.jpg" alt=""><br><img src="fast-ai-Deep-Learning-Lesson1/2.jpg" alt=""><br><img src="fast-ai-Deep-Learning-Lesson1/3.jpg" alt=""></p>
+<p>￼命令请求图表嵌入到jupyter notebook中，在jupyter notebook中输入：</p>
+<pre><code>matplotlib inline
+</code></pre><p>shift+enter：表示输入进入下一个单元格    </p>
+<pre><code>path=&quot;data/dogscats/sample/&quot;
+#path=&quot;data/dogscats/&quot;
+</code></pre><p>使用anaconda进行安装所有包（下面的命令），课程提供的AMI插件已经为我们准备好了</p>
+<pre><code>conda install
+</code></pre><p>没有conda的话，也可以使用pip替代<br>对线性代数不熟悉的可以去网站相关链接可汗学院  </p>
+<p>ImageNet:图片数据库</p>
+<p>使用VGG模型：简单且强大<br>2012:AlexNet<br>2014:VGG<br>2015:conceotion<br>2016:ResNext  </p>
+<p>使用7行代码将业界区分猫和狗的准确率由80%提升到97%<br><img src="fast-ai-Deep-Learning-Lesson1/4.jpg" alt=""></p>
+<pre><code>vim ~/.keras/
+vim ~/.keras/keras.json
+</code></pre><p>将“backend”后的“theano”改成“tensorflow”，再把最上行的“th”改成“tf”，即可切换</p>
+<p>配置文件：（一般结尾都是rc）</p>
+<pre><code>vim ~/.theanorc
+</code></pre><p>device=gpu：P2实例<br>device=cpu：T2实例</p>
+<p>可以通过下列命令查看我们下载的代码：</p>
+<pre><code>vim ../../vgg16.py
+</code></pre><p>我们每次抓取的是mini-batch数量大小的图片，并且马上对所有这些进行计算。<br>为什么我们不一张一张抓取？<br>一个GPU可以同时运行成千上万的东西，所以一张图是不够让GPU忙起来的，并且会变得很慢<br>为什么不运行整个数据库呢？<br>一般情况下是在2G-12G之间，然而你的数据库不太适合那个区间</p>
+<p>如何查看VGG模型运行的结果，我们每次运行4张图片</p>
+<pre><code>vgg=Vgg16()
+batches=vgg.get_batches(path+&apos;train&apos;,batch_size=4)
+imgs,labels=next(batches)
+plots(imgs,titles=labels)
+vgg.predict(imgs,True)
+</code></pre><p>微调后已经建立了模型帮助我们区分图片是猫还是狗：</p>
+<pre><code>vgg.finetune(batches)
+</code></pre><p>开始训练，利用反向传播建立下将梯度，让这个模型识别能力更强,如果你想让准确率变高，可以重新运行这个单元多次</p>
+<pre><code>vgg.fit(batches,val_batches,nb_epoch=1)
+</code></pre>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/21/git-article/" rel="next" title="git article to github">
+                <i class="fa fa-chevron-left"></i> git article to github
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/05/实体抽取算法总结/" rel="prev" title="实体抽取算法总结">
+                实体抽取算法总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Luqh</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">Artikel</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#准备工作"><span class="nav-number">1.</span> <span class="nav-text">准备工作</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Luqh</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Erstellt mit  <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
