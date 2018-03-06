@@ -87,7 +87,9 @@
 <meta property="og:description" content="参考链接：https://www.lookfor404.com/   &amp;emsp;&amp;emsp;命名实体（Named Entity ）主要包括实体（组织名，人名，地名）、时间表达式（日期、时间）和数字表达式（货币值、百分数等）。在对文档进行命名实体识别之前必须对文档进行分句，分词和词性标注。&amp;emsp;&amp;emsp;目前已有的命名实体识别的方法主要分为两大类：基于规则的方法和基于统计的方法。目前国内有">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://www.lookfor404.com/wp-content/uploads/2018/02/nt.tr_.txt%E6%96%87%E4%BB%B6.png">
-<meta property="og:updated_time" content="2018-03-05T13:33:38.000Z">
+<meta property="og:image" content="https://www.lookfor404.com/wp-content/uploads/2018/02/Word-level-representation-from-characters-embeddings.jpg">
+<meta property="og:image" content="https://www.lookfor404.com/wp-content/uploads/2018/02/%E5%88%A9%E7%94%A8%E5%8F%8C%E5%90%91LSTM%E6%8F%90%E5%8F%96%E4%B8%8A%E4%B8%8B%E6%96%87%E4%BF%A1%E6%81%AF.jpg">
+<meta property="og:updated_time" content="2018-03-06T11:13:04.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="实体抽取算法总结">
 <meta name="twitter:description" content="参考链接：https://www.lookfor404.com/   &amp;emsp;&amp;emsp;命名实体（Named Entity ）主要包括实体（组织名，人名，地名）、时间表达式（日期、时间）和数字表达式（货币值、百分数等）。在对文档进行命名实体识别之前必须对文档进行分句，分词和词性标注。&amp;emsp;&amp;emsp;目前已有的命名实体识别的方法主要分为两大类：基于规则的方法和基于统计的方法。目前国内有">
@@ -339,7 +341,34 @@
 </ul>
 <p>&emsp;&emsp;在使用CRF模型之后，我们得到了不错的效果。线下训练文本的实体召回率可以达到91.3％，另外，识别出来的无效实体也少了很多。<br>&emsp;&emsp;当然，这个模型也不是完美的，比如，我们训练的这个模型就比较“看重”机构特征词。举个例子，如果“下属公司”单独出现，则它也可能会被识别为机构名，需要我们人工定义一些规则将其去除。  </p>
 <p>&emsp;&emsp;利用双向lstm+CRF做命名实体识别：  </p>
-<p>现在最主流最有效的方法基本上就是lstm+CRF了。其中CRF部分，只是把转移矩阵加进来了而已，而其它特征的提取则是交由神经网络来完成。当然了，特征提取这一部分我们也可以使用CNN，或者加入一些attention机制。最终只是想对句子里面的每一个词，分配一个标签。<br>对于每一个单词，我们用词向量$w\in\mathbb{R}^n$来表示，用来捕获词本身的信息。这个词向量由两部分concat起来，一部分是用GloVe训练出来的词向量$w_{glove}\in \mathbb{R}^{d_1}$，另一部分，是字符级别的向量$w_{chars}\in\mathbb{R}^{d_2}$<br>$F_a = F_b + F_c + F_{\mu}$</p>
+<p>现在最主流最有效的方法基本上就是lstm+CRF了。其中CRF部分，只是把转移矩阵加进来了而已，而其它特征的提取则是交由神经网络来完成。当然了，特征提取这一部分我们也可以使用CNN，或者加入一些attention机制。最终只是想对句子里面的每一个词，分配一个标签。 </p>
+<p>1.分配tag  </p>
+<p>实体为LOC,PER,ORG和MISC，分别代表着地名，人名，机构名以及其他实体，其它词语会被标记为O。由于有一些实体（比如New York）由多个词组成，所以我们使用用一种简单的标签体系：B-来标记实体的开始部分，I-来标记实体的其它部分。我们最终只是想对句子里面的每一个词，分配一个标签。 </p>
+<p>2.词向量表示  </p>
+<ul>
+<li>对于每一个单词，我们用词向量$w\in\mathbb{R}^n$来表示，用来捕获词本身的信息。这个词向量由两部分concat起来，一部分是用GloVe训练出来的词向量$w_{glove}\in \mathbb{R}^{d_1}$，另一部分，是字符级别的向量$w_{chars}\in\mathbb{R}^{d_2}$  </li>
+<li>不需要人工提取特征，只需要字符级别上面使用双向LSTM，就可以提取到一些拼写层面的特征了。当然了，CNN或者其他的RNN也可以干类似的事情。  </li>
+</ul>
+<p><img src="https://www.lookfor404.com/wp-content/uploads/2018/02/Word-level-representation-from-characters-embeddings.jpg" alt=""></p>
+<p>3.词的上下文信息表示  </p>
+<ul>
+<li>当有了词向量w之后，就可以对一个句子里的每一个词跑LSTM或者双向LSTM了，然后得到另一个向量表示：$h \in \mathbb{R}^k$</li>
+<li>我们输入一个句子，有m个单词：$w_1, \ldots, w_m \in \mathbb{R}^n$，得到m个输出：$h_1, \ldots, h_m \in \mathbb{R}^k$。现在的输出，是包含上下文信息的  </li>
+</ul>
+<p><img src="https://www.lookfor404.com/wp-content/uploads/2018/02/%E5%88%A9%E7%94%A8%E5%8F%8C%E5%90%91LSTM%E6%8F%90%E5%8F%96%E4%B8%8A%E4%B8%8B%E6%96%87%E4%BF%A1%E6%81%AF.jpg" alt="">  </p>
+<p>4.解码，为单词分配tag<br>最后，我们要对每一个词分配一个tag。用一个全连接层就可以搞定。假如，一共有9种tag，那么我们可以得到权重矩阵$W \in \mathbb{R}^{9 \times k}$和偏置矩阵$b \in \mathbb{R}^9$，最后计算某个词的得分向量$s \in \mathbb{R}^9 = W \cdot h + b$,$s[i]$可以解释为，某个词标记成第i个tag的得分，有了分数之后，我们有两种方案用来计算最后的tag：  </p>
+<ul>
+<li>softmax：将得分归一化为概率。做了局部的考虑，也就是说，当前词的tag，是不受其它的tag的影响的。而事实上，当前词tag是受相邻词tag的影响的。</li>
+<li>线性CRF：刻画相邻tag的依赖、转移关系，得出CRF得分式子  </li>
+</ul>
+<p>了解了CRF得分式子，接下来要做两件事： </p>
+<ul>
+<li>找到得分最高的tag序列。</li>
+<li>计算句子的tag概率分布。</li>
+</ul>
+<p>5.训练  </p>
+<p>6.使用模型  </p>
+<p>另外，用多模态来做实体识别也是一个方向，特别是对于一些类似微博的语料（有图片），这样做效果更佳。</p>
 
       
     </div>
@@ -373,10 +402,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/03/06/test/" rel="prev" title="">
-                 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -444,7 +469,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">Artikel</span>
                 </a>
               </div>
