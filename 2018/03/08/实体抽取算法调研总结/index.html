@@ -1,0 +1,111 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description"><title> | Manan's Nar</title><link rel="stylesheet" type="text/css" href="//fonts.neworld.org/css?family=Source+Code+Pro"><link rel="stylesheet" type="text/css" href="/css/style.css?v=2.0.1"><link rel="stylesheet" type="text/css" href="/css/highlight.css?v=2.0.1"><link rel="Shortcut Icon" href="/favicon.ico"><link rel="bookmark" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">Manan's Nar</h1><a id="logo" href="/.">Manan's Nar</a><p class="description"></p></div><div id="nav-menu"><a href="/." class="current"><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div><div id="search-form"><div id="result-mask" class="hide"></div><label><input id="search-key" type="text" autocomplete="off" placeholder="Arama"></label><div id="result-wrap" class="hide"><div id="search-result"></div></div><div class="hide"><template id="search-tpl"><div class="item"><a href="/{path}" title="{title}"><div class="title">{title}</div><div class="time">{date}</div><div class="tags">{tags}</div></a></div></template></div></div></div><div id="layout" class="layout-g"><div class="layout-l"><div class="content_container"><div class="post"><h1 class="post-title"></h1><div class="post-meta"><a href="/2018/03/08/实体抽取算法调研总结/#comments" class="comment-count"></a><p><span class="date">Mar 08, 2018</span><span><i id="busuanzi_container_page_pv"><i id="busuanzi_value_page_pv"></i><i>点击</i></i></span></p></div><div class="post-content"><h1 id="实体抽取部分调研"><a href="#实体抽取部分调研" class="headerlink" title="实体抽取部分调研"></a>实体抽取部分调研</h1><h2 id="常用方法（算法）"><a href="#常用方法（算法）" class="headerlink" title="常用方法（算法）"></a>常用方法（算法）</h2><h3 id="一、基于规则和词典"><a href="#一、基于规则和词典" class="headerlink" title="一、基于规则和词典"></a>一、基于规则和词典</h3><p>基于规则的方法多采用语言学专家手工构造规则模板，选用特征包括统计信息、标点符号、关键字、指示词和方向词、位置词（如尾字）、中心词等方法，以模式和字符串相匹配为主要手段，这类系统大多依赖于知识库和词典的建立。使用基于规则的方法来进行命名实体识别比较消耗时间和消耗人力。 一般分为以下几个步骤：</p>
+<ol>
+<li>分词</li>
+<li>收集特征词词典，特征词指的是诸如：公司，有限公司，管理局这些词语</li>
+<li>对文本分词后的词语进行标注，例如：OOSE</li>
+<li>根据标注（规则）进行正则表达式匹配  </li>
+</ol>
+<p>具体做法可以参见:<a href="https://www.lookfor404.com/用规则做命名实体识别-ner系列（一）/" target="_blank" rel="noopener">https://www.lookfor404.com/用规则做命名实体识别-ner系列（一）/</a></p>
+<h3 id="二、基于统计"><a href="#二、基于统计" class="headerlink" title="二、基于统计"></a>二、基于统计</h3><p>基于统计的方法利用人工标注的语料进行训练，标注语料时不需要广博的语言学知识，并且可以在较短时间内完成。但是由于基于统计的方法获取的概率知识不如基于规则的方法所具有的专家的语言学知识的可靠性，所以基于统计的命名实体识别系统的性能要比基于规则的命名实体识别的性能要低。  </p>
+<p>用于命名实体识别的基于统计的方法主要有：隐马尔科夫模型（Hidden Markov Model, HMM）、最大熵（MaximunmEntropy, ME）、条件随机场（ConditionalRandom Fields, CRF）等。目前评价性能最好的是隐马尔克夫模型。  </p>
+<p>####1.隐马尔科夫模型  </p>
+<p>隐马尔可夫模型有三种应用场景，做命名实体识别只用到其中的一种，求观察序列的背后最可能的标注序列。即：根据输入的一系列单词，去生成其背后的标注，从而得到实体。模型中的主要部分意义如下：  </p>
+<ul>
+<li>N:状态的有限集合。在这里，是指每一个词语背后的标注。  </li>
+<li>M:观察值的有限集合。在这里，是指每一个词语本身。</li>
+<li>A:状态转移概率矩阵。在这里，是指某一个标注转移到下一个标注的概率。</li>
+<li>B:观测概率矩阵，也就是发射概率矩阵。在这里，是指在某个标注下，生成某个词的概率。</li>
+<li>π:初始概率矩阵。在这里，是指每一个标注的初始化概率。  </li>
+</ul>
+<p>这些元素，都是可以从训练语料集中统计出来的。训练语料样例如下：  </p>
+<p>1.会议 B 163 C 107 A 10</p>
+<p>意思是，会议这个词作为B标签出现了163次，作为C标签出现了107次，作为A标签出现了10次.  </p>
+<p>2.标签转移矩阵<br><img src="https://www.lookfor404.com/wp-content/uploads/2018/02/nt.tr_.txt%E6%96%87%E4%BB%B6.png" alt="Alt text"><br>意思是，每一个标签转移到另一个标签的次数。比如第二行第四列的19945，代表着【A标签后面接着是C标签】出现了19945次。</p>
+<p>最后，我们根据这些统计值，应用维特比（viterbi）算法，就可以算出词语序列背后的标注序列了。</p>
+<p>命名实体识别本质上就是序列标注，只需要自己定义好对应的标签以及模式串，就可以从标注序列中提取出实体块了。  </p>
+<p>标注序列中哪些标注代表着实体呢？</p>
+<p>HanLP作者整理了一个nt.pattern.txt，里面是所有可能是机构名的序列模式串（有点粗暴），然后用Aho-Corasick算法来进行匹配。具体的实现在OrgRecognize.py里面的get_organization，函数的作用是，输入原词语序列、识别出来的标注序列和序列模式串，输出识别出来的机构名实体。 </p>
+<p>具体做法可以参见:    <a href="https://www.lookfor404.com/用隐马尔可夫模型hmm做命名实体识别-ner系列二/" target="_blank" rel="noopener">https://www.lookfor404.com/用隐马尔可夫模型hmm做命名实体识别-ner系列二/</a></p>
+<p>####2.条件随机场</p>
+<p>在深度学习技术火起来之前，主流的、最有效的方法，就是CRF(条件随机场)模型。 原理略过，其训练主要步骤如下：  </p>
+<ul>
+<li><p>定义实体标注集合  </p>
+<p>B:实体的开头 M:实体的中间部分 E:实体的结束 W:单独成实体 O:句子的其它成分  </p>
+</li>
+<li><p>训练文本、测试文本预处理：根据标注集合和额外四个特征对文本标注  </p>
+<p>注意训练文本要有正确的实体标注作为标签  </p>
+</li>
+<li><p>测试文本的预处理和上面的基本一样，区别在于，测试文本没有正确的实体标注，所以测试文本的预处理文件只有五列。最后我们要用CRF模型预测的是第六列，即标注</p>
+</li>
+<li>训练CRF模型，CRF模型的训练需要一个特征模板，以便能够自动在训练文本中提取特征函数，特征模板的定义直接决定了最后的识别效果  </li>
+<li>可以采用CRF++这个开源工具包   </li>
+</ul>
+<p>具体做法可以参见: <a href="https://www.lookfor404.com/用crf做命名实体识别-ner系列（三）/" target="_blank" rel="noopener">https://www.lookfor404.com/用crf做命名实体识别-ner系列（三）/</a></p>
+<h3 id="三、混合方法"><a href="#三、混合方法" class="headerlink" title="三、混合方法"></a>三、混合方法</h3><p>自然语言处理并不完全是一个随机过程，单独使用基于统计的方法使状态搜索空间非常庞大，必须借助规则知识提前进行过滤修剪处理，或者借助规则修正统计模型的结果。目前几乎没有单纯使用统计模型而不使用规则知识的命名实体识别系统，在很多情况下是使用混合方法。  </p>
+<p>例如：哈工大信息检索研究室 语言技术平台相关技术  </p>
+<p>模块名称：NE识别系统<br>模块负责人：廖先桃<br>曾经开发人员：于海滨<br>模块简介：命名实体识别系统可识别人名、地名、机构名、专有名词、时间、日期、数量短语等七类实体。该模块采用统计和规则相结合的方法实现。先利用基于HMM的方法对文本进行初始标注，然后再利用规则的方法对错标或漏标的结果进行修正，使规则和统计相结合，达到最佳的识别效果。我们抽取的规则包括NE的内部结构特征，上下文特征，用字特征等。利用人民日报语料测试，总的F值为86.93％。  </p>
+<h3 id="四、基于深度学习"><a href="#四、基于深度学习" class="headerlink" title="四、基于深度学习"></a>四、基于深度学习</h3><p>现在最主流最有效的方法基本上就是lstm+CRF。其中CRF部分，只是把转移矩阵加进来了而已，而其它特征的提取则是交由神经网络来完成。特征提取这一部分也可以使用CNN，或者加入一些attention机制。具体步骤如下：  </p>
+<p>1.分配标签  </p>
+<p>实体为LOC,PER,ORG和MISC，分别代表着地名，人名，机构名以及其他实体，其它词语会被标记为O。由于有一些实体（比如New York）由多个词组成，所以我们使用用一种简单的标签体系：B-来标记实体的开始部分，I-来标记实体的其它部分。我们最终只是想对句子里面的每一个词，分配一个标签。 </p>
+<p>2.词向量表示  </p>
+<ul>
+<li>对于每一个单词，我们用词向量$w\in\mathbb{R}^n$来表示，用来捕获词本身的信息。这个词向量由两部分concat起来，一部分是用Glove训练出来的词向量$w_{glove}\in \mathbb{R}^{d_1}$，另一部分，是字符级别的向量$w_{chars}\in\mathbb{R}^{d_2}$  </li>
+<li>不需要人工提取特征，只需要字符级别上面使用双向LSTM，就可以提取到一些拼写层面的特征。CNN或者其他的RNN也可以干类似的事情。  </li>
+</ul>
+<p><img src="https://www.lookfor404.com/wp-content/uploads/2018/02/Word-level-representation-from-characters-embeddings.jpg" alt=""></p>
+<p>3.词的上下文信息表示  </p>
+<ul>
+<li>当有了词向量w之后，就可以对一个句子里的每一个词跑LSTM或者双向LSTM了，然后得到另一个向量表示：$h \in \mathbb{R}^k$</li>
+<li>我们输入一个句子，有m个单词：$w_1, \ldots, w_m \in \mathbb{R}^n$，得到m个输出：$h_1, \ldots, h_m \in \mathbb{R}^k$。现在的输出，是包含上下文信息的  </li>
+</ul>
+<p><img src="https://www.lookfor404.com/wp-content/uploads/2018/02/%E5%88%A9%E7%94%A8%E5%8F%8C%E5%90%91LSTM%E6%8F%90%E5%8F%96%E4%B8%8A%E4%B8%8B%E6%96%87%E4%BF%A1%E6%81%AF.jpg" alt="">  </p>
+<p>4.解码，为单词分配标签<br>要对每一个词分配一个tag，用一个全连接层就可以搞定。假如，一共有9种tag，那么我们可以得到权重矩阵$W \in \mathbb{R}^{9 \times k}$和偏置矩阵$b \in \mathbb{R}^9$。计算某个词的得分向量$s \in \mathbb{R}^9 = W \cdot h + b$，$s[i]$可以解释为，某个词标记成第i个tag的得分，有了分数之后，我们有两种方案用来计算最后的tag：  </p>
+<ul>
+<li>softmax：将得分归一化为概率。做了局部的考虑，也就是说，当前词的tag，是不受其它的tag的影响的。而事实上，当前词tag是受相邻词tag的影响的。</li>
+<li>线性CRF：刻画相邻tag的依赖、转移关系，得出CRF得分计算公式。  </li>
+</ul>
+<p>得到了CRF得分计算，接下来要做两件事： </p>
+<ul>
+<li>找到得分最高的tag序列，具体方法参见下面链接</li>
+<li>计算句子的tag概率分布，具体方法参见下面链接</li>
+</ul>
+<p>5.训练神经网络  </p>
+<p>6.使用模型预测  </p>
+<p>具体做法可以参见:<a href="https://www.lookfor404.com/用双向lstmcrf做命名实体识别附tensorflow代码-ner系列（四/" target="_blank" rel="noopener">https://www.lookfor404.com/用双向lstmcrf做命名实体识别附tensorflow代码-ner系列（四/</a>  </p>
+<p>Paper:Neural Architectures for Named Entity Recognition，深度学习(LSTM-CRF)  </p>
+<p>在论文《Joint Entity and Relation Extraction Based on A Hybrid Neural Network》中，作者提出了混合的神经网络模型来进行命名实体识别（NER)和关系分类（RC)。NER和RC使用同一BiLstm网络对输入进行编码，根据NER预测的结果对实体进行配对，然后将实体之间的文本使用一个CNN网络进行关系分类。  </p>
+<p>在论文《A neural joint model for entity and relation extraction from biomedical text》中，作者将联合学习的方法用于生物医学实体识别和关系抽取当中，在关系分类时，输入的语句首先进行依存分析构建起依存句法树，然后将这种树状结构输入到Bilstm+RNN的网络中进行关系分类。通过以上的方法可以看出，两个任务的网络通过共享参数的方式联合学习，训练先进行NER，再根据NER的结果进行关系分类。    </p>
+<p>今年ACL的Outstanding Paper《Joint Extraction of Entities and Relations Based on a Novel Tagging Scheme》提出了一种新的标注策略来进行关系抽取，采用一种jointly的方法把命名实体识别（named entity recognize）和关系抽取（relation extraction）两步结合到一起：通过一种新的标注策略（tagging scheme）把抽取任务转换为标注任务，然后利用深度学习的方法通过一个端到端的模型（end-to-end tagging model）来抽取出最终的结果。模型还是使用 BiLSTM来进行编码，然后使用参数共享中的 LSTM 来进行解码。这一模型可以用于丰富已有的知识图谱资源，例如现在多样的智能化应用，如：自动问答、智能搜索、个性化推荐等，都需要知识图谱的支撑。<br>上述参考链接<a href="https://www.cnblogs.com/jiqibuxuexi/p/8410628.html" target="_blank" rel="noopener">https://www.cnblogs.com/jiqibuxuexi/p/8410628.html</a>  </p>
+<p>##总结<br><strong>最大熵模型</strong>结构比较紧凑、具有较好的通用性，主要缺点是训练时间复杂性非常高，有时甚至导致训练代价难以承受，另外由于需要明确的归一化计算，导致开销比较大。而<strong>条件随机场</strong>为命名实体识别提供了一个特征灵活、全局最优的标注框架，但同时存在收敛速度慢、训练时间长的问题。一般说来，最大熵和支持向量机在正确率上要比隐马尔科夫模型高一些，但是<strong>隐马尔科夫模型</strong>在训练和识别的速度要快一些，主要是由于在利用Viterbi算法求解命名实体类别序列的效率比较高。隐马尔科夫模型更适用于一些对实时性有要求以及像信息检索这样需要处理大量文本的应用，如短文本命名实体识别。</p>
+<h2 id="成熟的开源工具采用的方法"><a href="#成熟的开源工具采用的方法" class="headerlink" title="成熟的开源工具采用的方法"></a>成熟的开源工具采用的方法</h2><h3 id="哈工大LTP"><a href="#哈工大LTP" class="headerlink" title="哈工大LTP"></a>哈工大LTP</h3><p>哈工大在命名实体识别上据说是做得最好的  </p>
+<p>将命名实体识别建模为基于词的序列标注问题。对于输入句子的词序列，模型给句子中的每个词标注一个标识命名实体边界和实体类别的标记。在LTP中，我们支持人名、地名、机构名三类命名实体的识别。   </p>
+<p>模型简介<br>NER（Named Entity Recognition, 命名实体识别）把命名实体识别的过程看作一个多分类的问题，使用最大熵模型来完成这一任务。  </p>
+<p>使用开源工具：Maximum Entropy Modeling Toolkit for Python and C++</p>
+<p>使用资源<br>数据来源：1998年1月份人民日报+6月份人民日报前10000句<br>数据规模：1月份数据进行训练、6月份前10000句测试<br>性能及效率<br>性能：F1(overall)=92.25%<br>效率：11KB/s      </p>
+<h3 id="HanLP"><a href="#HanLP" class="headerlink" title="HanLP"></a>HanLP</h3><p>命名实体识别部分</p>
+<p>1.实体机构名识别（层叠HMM-Viterbi）<br>《层叠HMM-Viterbi角色标注模型下的机构名识别》  </p>
+<p>2.中国人名识别（HMM-Viterbi）<br>《实战HMM-Viterbi角色标注中国人名识别》</p>
+<p>3.音译人名识别（层叠隐马模型）<br>《层叠隐马模型下的音译人名和日本人名识别》</p>
+<p>4.日本人名识别（层叠隐马模型）<br> 《层叠隐马模型下的音译人名和日本人名识别》</p>
+<p>5.地名识别（HMM-Viterbi）<br> 《实战HMM-Viterbi角色标注地名识别》  </p>
+<p>参考NLP界各位学者老师的著作实现：</p>
+<p>《基于角色标注的中国人名自动识别研究》张华平 刘群  </p>
+<p>《基于层叠隐马尔可夫模型的中文命名实体识别》俞鸿魁 张华平 刘群 吕学强 施水才  </p>
+<p>《基于角色标注的中文机构名识别》俞鸿魁 张华平 刘群  </p>
+<p>《基于最大熵的依存句法分析》 辛霄 范士喜 王轩 王晓龙  </p>
+<p>An Efficient Implementation of Trie Structures, JUN-ICHI AOE AND KATSUSHI MORIMOTO  </p>
+<p>TextRank: Bringing Order into Texts, Rada Mihalcea and Paul Tarau   </p>
+<p>Hanlp优点<br>功能相对比较全，分词，词性，实体，句法分析….<br>所有实现是纯Java的，代码结构相对清晰，具有很好的学习参考价值  </p>
+<p>Hanlp缺点<br>没有模型训练代码<br>代码有不严谨的地方  </p>
+<h3 id="斯坦福CoreNLP"><a href="#斯坦福CoreNLP" class="headerlink" title="斯坦福CoreNLP"></a>斯坦福CoreNLP</h3><p>Stanford NER作为CRFClassifier（条件随机场分类器）也是很著名的。此软件提供一个对于（任意序列）线性链条件随机场（CRF）序列模型的通用实现。这意味着通过训练自己的模型，实际上可以使用该代码为任何任务构建序列模型。   </p>
+<p>它配有仔细设计的特征提取器，用于命名实体识别，以及许多用于定义特征提取器的其他选项，其中包含三种分类（PERSON、ORGANIZATION、LOCATION）的英语识别器，Stanford NLP Group 也在原项目页面中提供了其他不同语言和环境的模型，包括仅训练过 CoNLL 2003 数据集的版本：<a href="https://nlp.stanford.edu/software/CRF-NER.html" target="_blank" rel="noopener">https://nlp.stanford.edu/software/CRF-NER.html</a></p>
+<p>这里提供的CRF序列模型没有精准对应于任何已经出版的文章，但是文章或者软件可以这样引用：Jenny Rose Finkel, Trond Grenager, and Christopher Manning. 2005. Incorporating Non-local Information into Information Extraction Systems by Gibbs Sampling. Proceedings of the 43nd Annual Meeting of the Association for Computational Linguistics (ACL 2005), pp. 363-370.<br><a href="http://nlp.stanford.edu/~manning/papers/gibbscrf3.pdf" target="_blank" rel="noopener">http://nlp.stanford.edu/~manning/papers/gibbscrf3.pdf</a></p>
+<p>CoreNLP优点：<br>算法有做优化<br>功能比较丰富<br>有模型训练代码<br>文档相对完善  </p>
+<p>缺点：<br>代码组织比较混乱<br>比较耗内存<br>官方提供的模型对我们的数据不具有扩展性    </p>
+<h3 id="OpenNLP"><a href="#OpenNLP" class="headerlink" title="OpenNLP"></a>OpenNLP</h3><p>基于最大熵的分词实现<br>网上没有太多关于其实现基于的算法的介绍</p>
+<h1 id="科技部项目对标："><a href="#科技部项目对标：" class="headerlink" title="科技部项目对标："></a>科技部项目对标：</h1><ol>
+<li>目前还没有基于深度学习的开源工具包，仅有根据论文等参考资料的实现代码。我们如果想要和开源工具对标的话，或许可以自己实现基于深度学习进行实体抽取的工具包？  </li>
+<li>或许我们可以找关于实体抽取的前沿的论文，来对论文进行复现？</li>
+</ol>
+</div><div class="tags"></div><div class="post-share"><div class="bdsharebuttonbox"><span style="float:left;line-height: 28px;height: 28px;font-size:16px;font-weight:blod">分享到：</span><a href="#" data-cmd="more" class="bds_more"></a><a href="#" data-cmd="mshare" title="分享到一键分享" class="bds_mshare"></a><a href="#" data-cmd="fbook" title="分享到Facebook" class="bds_fbook"></a><a href="#" data-cmd="twi" title="分享到Twitter" class="bds_twi"></a><a href="#" data-cmd="linkedin" title="分享到linkedin" class="bds_linkedin"></a><a href="#" data-cmd="youdao" title="分享到有道云笔记" class="bds_youdao"></a><a href="#" data-cmd="evernotecn" title="分享到印象笔记" class="bds_evernotecn"></a><a href="#" data-cmd="weixin" title="分享到微信" class="bds_weixin"></a><a href="#" data-cmd="qzone" title="分享到QQ空间" class="bds_qzone"></a><a href="#" data-cmd="tsina" title="分享到新浪微博" class="bds_tsina"></a></div></div><div class="post-nav"><a href="/2018/03/08/深度学习实体抽取资料/" class="next"></a></div><div id="comments"></div></div></div></div><div class="layout-r"><div id="sidebar"><div class="search-pla"></div><div id="toc" class="widget"><div class="widget-title"><i class="fa fa-fei">文章目录</i></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#实体抽取部分调研"><span class="toc-text">实体抽取部分调研</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#常用方法（算法）"><span class="toc-text">常用方法（算法）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、基于规则和词典"><span class="toc-text">一、基于规则和词典</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、基于统计"><span class="toc-text">二、基于统计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三、混合方法"><span class="toc-text">三、混合方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#四、基于深度学习"><span class="toc-text">四、基于深度学习</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#成熟的开源工具采用的方法"><span class="toc-text">成熟的开源工具采用的方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#哈工大LTP"><span class="toc-text">哈工大LTP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HanLP"><span class="toc-text">HanLP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#斯坦福CoreNLP"><span class="toc-text">斯坦福CoreNLP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OpenNLP"><span class="toc-text">OpenNLP</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#科技部项目对标："><span class="toc-text">科技部项目对标：</span></a></li></ol></div><div class="widget"><div class="widget-title"><i class="fa fa-xie"> 最新文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/03/08/实体抽取算法调研总结/">实体抽取算法调研总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/03/08/深度学习实体抽取资料/">深度学习实体抽取资料</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/03/08/HanLP资料/">HanLP资料</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/03/08/斯坦福CoreNLP_NER资料/">斯坦福CoreNLP_NER资料</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/03/08/哈工大ltp资料/">哈工大ltp资料</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/03/05/实体抽取算法初步调研/">实体抽取算法总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/09/22/fast-ai-Deep-Learning-Lesson1/">fast.ai Deep Learning Lesson1</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/09/21/git-article/">git article to github</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/09/20/Hello-Hexo/">Hello-Hexo</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-biao"> 标签</i></div><div class="tagcloud"></div></div><div class="widget"><div class="widget-title"><i class="fa fa-archive"> 归档</i></div><ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">九月 2017</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-you"> 友情链接</i></div><ul></ul><a href="http://www.example1.com/" title="site-name1" target="_blank">site-name1</a><ul></ul><a href="http://www.example2.com/" title="site-name2" target="_blank">site-name2</a><ul></ul><a href="http://www.example3.com/" title="site-name3" target="_blank">site-name3</a></div></div></div></div><a id="totop" href="#top"></a><div id="footer"><div class="footer-info"><p><a href="/baidusitemap.xml">Baidu Site Haritası</a> |  <a href="/atom.xml">订阅</a> |  <a href="/about/">关于</a></p><p>本站总访问量：<i id="busuanzi_container_site_pv"><i id="busuanzi_value_site_pv"></i></i>次</p><p><span> Copyright &copy;<a href="/." rel="nofollow">Luqh.</a></span><span> Theme by<a rel="nofollow" target="_blank" href="https://github.com/chaooo/hexo-theme-BlueLake"> BlueLake.</a></span><span> Count by<a href="http://busuanzi.ibruce.info/"> busuanzi.</a></span><span> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a></span></p></div></div></div><script src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js" async></script><script type="text/javascript" src="/js/search.json.js?v=2.0.1"></script><script type="text/javascript" src="/js/toctotop.js?v=2.0.1" async></script><script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":["mshare","weixin","tsina","qzone","linkedin","fbook","twi","print","renren","sqq","evernotecn","bdysc","tqq","tqf","bdxc","kaixin001","tieba","douban","bdhome","thx","ibaidu","meilishuo","mogujie","diandian","huaban","duitang","hx","fx","youdao","sdo","qingbiji","people","xinhua","mail","isohu","yaolan","wealink","ty","iguba","h163","copy"],"bdPic":"","bdStyle":"1","bdSize":"16"},"share":{},"image":{"viewList":["tsina","qzone","weixin","fbook","twi","linkedin","youdao","evernotecn","mshare"],"viewText":"分享到：","viewSize":"16"},"selectShare":{"bdContainerClass":null,"bdSelectMiniList":["tsina","qzone","weixin","fbook","twi","linkedin","youdao","evernotecn","mshare"]}};with(document)0[(getElementsByTagName('head')[0]||head).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script></body></html>
